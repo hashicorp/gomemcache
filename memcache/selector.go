@@ -82,3 +82,23 @@ func (ss *ServerList) PickServer(key string) (net.Addr, error) {
 	cs := crc32.ChecksumIEEE([]byte(key))
 	return ss.addrs[cs%uint32(len(ss.addrs))], nil
 }
+
+// StaticSelector is a simple ServerSelector. Its zero value is usable.
+// It can be used to use the same host, and does not do DNS resolution
+// ahead of time. This makes it suitable for using CNAME's with dynamic
+// IP resolution
+type StaticSelector struct {
+	Addr string
+}
+
+func (ss *StaticSelector) PickServer(string) (net.Addr, error) {
+	return ss, nil
+}
+
+func (ss *StaticSelector) Network() string {
+	return "tcp"
+}
+
+func (ss *StaticSelector) String() string {
+	return ss.Addr
+}
